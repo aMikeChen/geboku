@@ -17,13 +17,14 @@ defmodule SlackBot.MixProject do
 
   def application do
     [
+      mod: {SlackBot.Application, []},
       extra_applications: [:logger]
     ]
   end
 
   defp deps do
     [
-      {:slack, "0.23.5"}
+      {:slack, github: "aMikeChen/Elixir-Slack", branch: "master"}
     ]
   end
 end

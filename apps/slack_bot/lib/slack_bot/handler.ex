@@ -3,16 +3,22 @@ defmodule SlackBot.Handler do
 
   require Logger
 
-  alias Slack.Web.Conversations
+  def start_link do
+    token = Application.get_env(:slack, :api_token)
+    Slack.Bot.start_link(__MODULE__, [], token)
+  end
 
   def handle_connect(slack, state) do
     Logger.info("[SlackBot] Connected as #{slack.me.name}")
-    {:ok, init_slack(slack)}
+
+    {:ok, state}
   end
 
   def handle_event(message = %{type: "message"}, slack, state) do
     Logger.info("[SlackBot] New message from #{message.channel}: #{message.text}")
-    send_message("New Message", message.channel, slack)
+    send_message(message.text, message.channel, slack)
+
+    {:ok, state}
   end
 
   def handle_event(_, _, state) do
@@ -28,14 +34,5 @@ defmodule SlackBot.Handler do
 
   def handle_info(_, _, state) do
     {:ok, state}
-  end
-
-  defp init_slack(slack) do
-    channels =
-      Conversations.list()
-      |> Map.fetch!("channels")
-      |> Map.new(&{&1["id"], SlackBot.Util.atomize_keys(&1)})
-
-    Map.put(slack, :channels, channels)
   end
 end
