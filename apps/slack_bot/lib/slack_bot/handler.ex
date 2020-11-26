@@ -1,4 +1,6 @@
 defmodule SlackBot.Handler do
+  @moduledoc false
+
   use Slack
 
   require Logger
